@@ -1,0 +1,7 @@
+<%= turbo_stream.append "projects" do %>
+  <%= render @projects %>
+<% end %>
+
+<%= turbo_stream.replace "pagination" do %>
+  <%= render "next_page", pagy: @pagy %>
+<% end %>

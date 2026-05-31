@@ -1,0 +1,128 @@
+<%# Status badge helper -%>
+<% status_styles = {
+  "active"    => { bg: "bg-emerald-100", text: "text-emerald-700", dot: "bg-emerald-400", label: "Active" },
+  "completed" => { bg: "bg-blue-100",    text: "text-blue-700",    dot: "bg-blue-400",    label: "Completed" },
+  "archived"  => { bg: "bg-slate-100",   text: "text-slate-500",   dot: "bg-slate-400",   label: "Archived" }
+} %>
+<% s = status_styles[project.status] || status_styles["archived"] %>
+<%= turbo_frame_tag dom_id(project) do %>
+
+<div class="group relative flex flex-col bg-white border border-slate-100 rounded-2xl
+            shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-200 overflow-hidden">
+
+  <%# ── Top accent bar ── %>
+  <div class="h-1 w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-80
+              group-hover:opacity-100 transition-opacity"></div>
+
+  <div class="flex flex-col gap-4 p-6 flex-1">
+
+    <%# ── Header row ── %>
+    <div class="flex items-start justify-between gap-3">
+      <h3 class="text-lg font-bold text-slate-800 leading-snug line-clamp-2 group-hover:text-indigo-600 transition-colors">
+        <%= project.name %>
+      </h3>
+
+      <%# Status badge %>
+      <span class="inline-flex shrink-0 items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold
+                   <%= s[:bg] %> <%= s[:text] %>">
+        <span class="w-1.5 h-1.5 rounded-full <%= s[:dot] %>"></span>
+        <%= s[:label] %>
+      </span>
+    </div>
+
+    <%# ── Description ── %>
+    <% if project.description.present? %>
+      <p class="text-sm text-slate-500 leading-relaxed line-clamp-3">
+        <%= project.description %>
+      </p>
+    <% else %>
+      <p class="text-sm text-slate-300 italic">No description provided.</p>
+    <% end %>
+
+    <%# ── Meta row ── %>
+    <div class="mt-auto flex flex-wrap items-center gap-3 pt-4 border-t border-slate-100">
+
+      <%# Owner avatar + name %>
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center justify-center w-7 h-7 rounded-full
+                     bg-indigo-100 text-indigo-600 text-xs font-bold uppercase">
+          <%= project.owner.email.first %>
+        </span>
+        <span class="text-xs text-slate-500 truncate max-w-[120px]">
+          <%= project.owner.email %>
+        </span>
+      </div>
+
+      <%# Due date %>
+      <% if project.due_date.present? %>
+        <% overdue = project.due_date < Date.today && project.status != "completed" %>
+        <div class="ml-auto flex items-center gap-1 text-xs font-medium
+                    <%= overdue ? 'text-rose-500' : 'text-slate-400' %>">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+          <%= project.due_date.strftime("%b %-d, %Y") %>
+        </div>
+      <% end %>
+
+    </div>
+  </div>
+
+  <%# ── Card footer / CTA ── %>
+  <div class="px-6 pb-5 flex items-center gap-2">
+
+    <%# View button — takes remaining space %>
+    <%= link_to project_path(project),
+          data: { turbo_frame: "_top" },
+          class: "flex-1 text-center py-2 text-sm font-semibold text-indigo-600
+                  border border-indigo-200 rounded-xl hover:bg-indigo-600 hover:text-white
+                  hover:border-indigo-600 transition-all duration-150" do %>
+      View →
+    <% end %>
+
+    <%# Edit icon button %>
+    <% if policy(project).update? %>
+      <%= link_to edit_project_path(project),
+            title: "Edit project",
+            data: { turbo_frame: "_top" },
+            class: "inline-flex items-center justify-center w-9 h-9 rounded-xl border border-slate-200
+                    text-slate-400 hover:bg-amber-50 hover:text-amber-600 hover:border-amber-300
+                    transition-all duration-150" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+             viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07
+                   a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 7.125L18 8.625"/>
+        </svg>
+      <% end %>
+    <% end %>
+
+    <%# Destroy icon button %>
+
+    <% if policy(project).destroy? %>
+      <%= button_to project_path(project),
+            method: :delete,
+            title: "Delete project",
+            data: { turbo_confirm: "Delete \"#{project.name}\"? This cannot be undone." },
+            class: "inline-flex items-center justify-center w-9 h-9 rounded-xl border border-slate-200
+                    text-slate-400 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-300
+                    transition-all duration-150 cursor-pointer" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+             viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166
+                   m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0
+                   01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12
+                   .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0
+                   -1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09
+                   2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/>
+        </svg>
+      <% end %>
+    <% end %>
+
+  </div>
+
+</div>
+<% end %>

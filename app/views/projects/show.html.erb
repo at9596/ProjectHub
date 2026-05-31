@@ -1,0 +1,160 @@
+<%# Project Show Page %>
+<% status_styles = {
+  "active"    => { bg: "bg-emerald-100", text: "text-emerald-700", dot: "bg-emerald-400" },
+  "completed" => { bg: "bg-blue-100",    text: "text-blue-700",    dot: "bg-blue-400" },
+  "archived"  => { bg: "bg-slate-100",   text: "text-slate-500",   dot: "bg-slate-400" }
+} %>
+<% s = status_styles[@project.status] || status_styles["archived"] %>
+
+<div class="max-w-3xl mx-auto">
+
+  <%# Breadcrumb %>
+  <nav class="flex items-center gap-2 text-sm text-slate-400 mb-6">
+    <%= link_to "Projects", projects_path, class: "hover:text-indigo-600 transition" %>
+    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+    </svg>
+    <span class="text-slate-600 font-medium truncate max-w-[220px]"><%= @project.name %></span>
+  </nav>
+
+  <%# ── Main Card ── %>
+  <div class="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden mb-6">
+    <div class="h-1 w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
+
+    <div class="p-8">
+
+      <%# Header %>
+      <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
+        <div>
+          <h1 class="text-3xl font-extrabold text-slate-900 leading-tight"><%= @project.name %></h1>
+
+          <div class="flex flex-wrap items-center gap-3 mt-3">
+            <%# Status badge %>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold <%= s[:bg] %> <%= s[:text] %>">
+              <span class="w-1.5 h-1.5 rounded-full <%= s[:dot] %>"></span>
+              <%= @project.status.humanize %>
+            </span>
+
+            <%# Due date %>
+            <% if @project.due_date.present? %>
+              <% overdue = @project.due_date < Date.today && @project.status != "completed" %>
+              <span class="inline-flex items-center gap-1 text-xs font-medium <%= overdue ? 'text-rose-500 bg-rose-50 border-rose-200' : 'text-slate-500 bg-slate-50 border-slate-200' %> border px-3 py-1 rounded-full">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                Due <%= @project.due_date.strftime("%b %-d, %Y") %>
+                <%= " — Overdue" if overdue %>
+              </span>
+            <% end %>
+          </div>
+        </div>
+
+        <%# Action buttons %>
+        <div class="flex shrink-0 items-center gap-2">
+          <% if policy(@project).update? %>
+            <%= link_to edit_project_path(@project),
+                  class: "inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold
+                          border border-slate-200 rounded-xl text-slate-600 hover:bg-amber-50
+                          hover:text-amber-600 hover:border-amber-300 transition-all duration-150" do %>
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"/>
+              </svg>
+              Edit
+            <% end %>
+          <% end %>
+
+          <% if policy(@project).destroy? %>
+            <%= button_to project_path(@project),
+                  method: :delete,
+                  data: { turbo_confirm: "Delete \"#{@project.name}\"? This cannot be undone." },
+                  class: "inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold
+                          border border-slate-200 rounded-xl text-slate-600 hover:bg-rose-50
+                          hover:text-rose-600 hover:border-rose-300 transition-all duration-150 cursor-pointer" do %>
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/>
+              </svg>
+              Delete
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+
+      <%# Divider %>
+      <div class="border-t border-slate-100 my-6"></div>
+
+      <%# Description %>
+      <div class="mb-6">
+        <h2 class="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-2">Description</h2>
+        <% if @project.description.present? %>
+          <p class="text-slate-700 leading-relaxed text-sm whitespace-pre-line"><%= @project.description %></p>
+        <% else %>
+          <p class="text-slate-400 italic text-sm">No description provided.</p>
+        <% end %>
+      </div>
+
+      <%# Meta grid %>
+      <div class="grid sm:grid-cols-2 gap-4 pt-4 border-t border-slate-100">
+
+        <%# Owner %>
+        <div class="flex items-center gap-3">
+          <span class="inline-flex items-center justify-center w-9 h-9 rounded-full
+                       bg-indigo-100 text-indigo-600 text-sm font-bold uppercase shrink-0">
+            <%= @project.owner.email.first %>
+          </span>
+          <div>
+            <p class="text-xs text-slate-400 font-medium">Owner</p>
+            <p class="text-sm text-slate-700 font-semibold"><%= @project.owner.email %></p>
+          </div>
+        </div>
+
+        <%# Created at %>
+        <div class="flex items-center gap-3">
+          <span class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-slate-100 text-slate-500 shrink-0">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </span>
+          <div>
+            <p class="text-xs text-slate-400 font-medium">Created</p>
+            <p class="text-sm text-slate-700 font-semibold"><%= @project.created_at.strftime("%b %-d, %Y") %></p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <%# ── Tasks Section placeholder ── %>
+  <div class="bg-white border border-slate-100 rounded-2xl shadow-sm p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-bold text-slate-800">Tasks</h2>
+      <span class="text-xs text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full font-semibold">
+        <%= @project.tasks.count %>
+      </span>
+    </div>
+
+    <% if @project.tasks.any? %>
+      <ul class="divide-y divide-slate-100">
+        <% @project.tasks.order(created_at: :desc).each do |task| %>
+          <li class="py-3 flex items-center justify-between gap-3">
+            <span class="text-sm text-slate-700"><%= task.title %></span>
+            <span class="text-xs text-slate-400"><%= task.status&.humanize %></span>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <div class="text-center py-8 text-slate-400">
+        <svg class="w-8 h-8 mx-auto mb-2 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        </svg>
+        <p class="text-sm">No tasks yet for this project.</p>
+      </div>
+    <% end %>
+  </div>
+
+</div>
