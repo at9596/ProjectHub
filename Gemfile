@@ -67,6 +67,7 @@ end
 
 gem "pundit", "~> 2.5"
 gem "devise", "~> 5.0"
+gem "devise_invitable", "~> 2.0"
 
 gem "tailwindcss-rails", "~> 4.4"
 

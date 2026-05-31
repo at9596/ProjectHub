@@ -1,0 +1,18 @@
+<h1 class="text-2xl font-bold mb-4">Labels</h1>
+
+<div class="space-y-3">
+  <% @labels.each do |label| %>
+    <div class="flex items-center gap-3 p-3 bg-white rounded-lg border">
+      <span
+        class="w-4 h-4 rounded-full"
+        style="background-color: <%= label.color %>">
+      </span>
+
+      <span><%= label.name %></span>
+
+      <span class="text-sm text-gray-500">
+        <%= pluralize(label.tasks.count, "task") %>
+      </span>
+    </div>
+  <% end %>
+</div>

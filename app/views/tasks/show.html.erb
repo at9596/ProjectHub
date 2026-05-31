@@ -1,0 +1,195 @@
+<%# Task Show Page %>
+<% priority_styles = { "low" => %w[bg-slate-100 text-slate-600], "medium" => %w[bg-blue-100 text-blue-700],
+                       "high" => %w[bg-amber-100 text-amber-700], "urgent" => %w[bg-rose-100 text-rose-600] } %>
+<% status_styles  = { "todo" => %w[bg-slate-100 text-slate-600], "in_progress" => %w[bg-blue-100 text-blue-700],
+                       "review" => %w[bg-amber-100 text-amber-700], "completed" => %w[bg-emerald-100 text-emerald-700] } %>
+<% ps = priority_styles[@task.priority] || priority_styles["low"] %>
+<% ss = status_styles[@task.status]   || status_styles["todo"] %>
+
+<div class="max-w-3xl mx-auto">
+
+  <%# Breadcrumb %>
+  <nav class="flex items-center gap-2 text-sm text-slate-400 mb-6">
+    <%= link_to "Projects", projects_path, class: "hover:text-indigo-600 transition" %>
+    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+    <%= link_to @project.name, @project, class: "hover:text-indigo-600 transition" %>
+    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+    <%= link_to "Tasks", project_tasks_path(@project), class: "hover:text-indigo-600 transition" %>
+    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+    <span class="text-slate-600 font-medium truncate max-w-[200px]"><%= @task.title %></span>
+  </nav>
+
+  <%# Main card %>
+  <div class="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden mb-6">
+    <div class="h-1 w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
+    <div class="p-8">
+
+      <%# Header %>
+      <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
+        <div class="flex-1">
+          <h1 class="text-2xl font-extrabold text-slate-900 leading-tight"><%= @task.title %></h1>
+          <div class="flex flex-wrap items-center gap-2 mt-3">
+            <%# Status %>
+            <span class="text-xs font-semibold px-2.5 py-1 rounded-full <%= ss.join(" ") %>">
+              <%= @task.status.humanize.gsub("_", " ") %>
+            </span>
+            <%# Priority %>
+            <span class="text-xs font-semibold px-2.5 py-1 rounded-full <%= ps.join(" ") %>">
+              <%= @task.priority.humanize %> Priority
+            </span>
+            <%# Labels %>
+            <% @task.labels.each do |label| %>
+              <span class="text-xs font-semibold px-2.5 py-1 rounded-full text-white"
+                    style="background-color: <%= label.color %>">
+                <%= label.name %>
+              </span>
+            <% end %>
+          </div>
+        </div>
+
+        <%# Actions %>
+        <div class="flex shrink-0 items-center gap-2">
+          <% if policy(@task).update? %>
+            <%= link_to edit_project_task_path(@project, @task),
+                  class: "inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold
+                          border border-slate-200 rounded-xl text-slate-600 hover:bg-amber-50
+                          hover:text-amber-600 hover:border-amber-300 transition" do %>
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"/>
+              </svg>
+              Edit
+            <% end %>
+          <% end %>
+          <% if policy(@task).destroy? %>
+            <%= button_to project_task_path(@project, @task),
+                  method: :delete,
+                  data: { turbo_confirm: "Delete this task? This cannot be undone." },
+                  class: "inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold
+                          border border-slate-200 rounded-xl text-slate-600 hover:bg-rose-50
+                          hover:text-rose-600 hover:border-rose-300 transition cursor-pointer" do %>
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/>
+              </svg>
+              Delete
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="border-t border-slate-100 my-6"></div>
+
+      <%# Description %>
+      <div class="mb-6">
+        <h2 class="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-3">Description</h2>
+        <% if @task.description.present? %>
+          <div class="prose prose-sm max-w-none text-slate-700">
+            <%= @task.description %>
+          </div>
+        <% else %>
+          <p class="text-sm text-slate-400 italic">No description added.</p>
+        <% end %>
+      </div>
+
+      <%# Meta grid %>
+      <div class="grid sm:grid-cols-3 gap-4 border-t border-slate-100 pt-5">
+        <%# Assignee %>
+        <div>
+          <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">Assigned to</p>
+          <% if @task.assignee %>
+            <div class="flex items-center gap-2">
+              <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-indigo-100 text-indigo-600 text-xs font-bold uppercase">
+                <%= @task.assignee.email.first %>
+              </span>
+              <span class="text-sm text-slate-700 font-semibold"><%= @task.assignee.name || @task.assignee.email %></span>
+            </div>
+          <% else %>
+            <span class="text-sm text-slate-400 italic">Unassigned</span>
+          <% end %>
+        </div>
+        <%# Due date %>
+        <div>
+          <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">Due date</p>
+          <% if @task.due_date.present? %>
+            <% overdue = @task.due_date < Date.today && @task.status != "completed" %>
+            <span class="text-sm font-semibold <%= overdue ? 'text-rose-600' : 'text-slate-700' %>">
+              <%= @task.due_date.strftime("%b %-d, %Y") %>
+              <%= " (overdue)" if overdue %>
+            </span>
+          <% else %>
+            <span class="text-sm text-slate-400 italic">No due date</span>
+          <% end %>
+        </div>
+        <%# Created %>
+        <div>
+          <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">Created</p>
+          <span class="text-sm text-slate-700 font-semibold"><%= @task.created_at.strftime("%b %-d, %Y") %></span>
+        </div>
+      </div>
+
+      <%# Attachments %>
+      <% if @task.attachments.attached? %>
+        <div class="mt-6 border-t border-slate-100 pt-5">
+          <h2 class="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-3">Attachments</h2>
+          <div class="flex flex-wrap gap-3">
+            <% @task.attachments.each do |attachment| %>
+              <%= link_to rails_blob_path(attachment, disposition: "attachment"),
+                    class: "flex items-center gap-2 px-4 py-2 bg-slate-50 border border-slate-200
+                            rounded-xl text-sm text-slate-700 hover:bg-indigo-50 hover:border-indigo-200
+                            hover:text-indigo-700 transition" do %>
+                <svg class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/>
+                </svg>
+                <%= attachment.filename %>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
+    </div>
+  </div>
+
+  <%# Comments section %>
+  <div class="bg-white border border-slate-100 rounded-2xl shadow-sm p-6">
+    <h2 class="text-lg font-bold text-slate-800 mb-5">
+      Comments
+      <span class="text-slate-400 text-base font-normal">(<%= @comments.count %>)</span>
+    </h2>
+
+    <%# Comment list %>
+    <div class="space-y-4 mb-6" id="comments">
+      <% @comments.each do |comment| %>
+        <%= render "comments/comment", comment: comment %>
+      <% end %>
+      <% if @comments.empty? %>
+        <p class="text-sm text-slate-400 text-center py-4">No comments yet. Be the first!</p>
+      <% end %>
+    </div>
+
+    <%# New comment form %>
+    <% if policy(Comment.new).create? %>
+      <div class="border-t border-slate-100 pt-5">
+        <%= form_with model: [@project, @task, @comment], url: project_task_comments_path(@project, @task) do |f| %>
+          <div class="flex gap-3 items-start">
+            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 text-sm font-bold uppercase shrink-0 mt-1">
+              <%= current_user.email.first %>
+            </span>
+            <div class="flex-1">
+              <%= f.text_area :body, rows: 3,
+                    placeholder: "Add a comment… Use @name to mention someone",
+                    class: "block w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-800
+                            placeholder-slate-400 text-sm resize-none focus:outline-none focus:ring-2
+                            focus:ring-indigo-500 transition" %>
+              <div class="flex justify-end mt-2">
+                <%= f.submit "Post Comment",
+                      class: "px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm
+                              font-semibold rounded-xl transition cursor-pointer" %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+</div>

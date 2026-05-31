@@ -1,0 +1,22 @@
+<%# Edit Task %>
+<div class="max-w-2xl mx-auto">
+  <nav class="flex items-center gap-2 text-sm text-slate-400 mb-6">
+    <%= link_to "Projects", projects_path, class: "hover:text-indigo-600 transition" %>
+    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+    <%= link_to @project.name, @project, class: "hover:text-indigo-600 transition" %>
+    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+    <%= link_to "Tasks", project_tasks_path(@project), class: "hover:text-indigo-600 transition" %>
+    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+    <%= link_to @task.title, project_task_path(@project, @task), class: "hover:text-indigo-600 transition truncate max-w-[160px]" %>
+    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+    <span class="text-slate-600 font-medium">Edit</span>
+  </nav>
+
+  <div class="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
+    <div class="h-1 w-full bg-gradient-to-r from-amber-400 via-orange-400 to-pink-500"></div>
+    <div class="p-8">
+      <h1 class="text-2xl font-extrabold text-slate-900 mb-6">Edit Task</h1>
+      <%= render "form", task: @task %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,23 @@
+<%# Shared Activity Feed Partial — pass `activities` local %>
+<% activities ||= [] %>
+<div class="space-y-3">
+  <% if activities.any? %>
+    <% activities.each do |activity| %>
+      <div class="flex items-start gap-3">
+        <span class="inline-flex items-center justify-center w-7 h-7 rounded-full
+                     bg-indigo-100 text-indigo-600 text-xs font-bold uppercase shrink-0 mt-0.5">
+          <%= activity.user.email.first %>
+        </span>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm text-slate-700">
+            <span class="font-semibold"><%= activity.user.name || activity.user.email %></span>
+            <%= activity.description %>
+          </p>
+          <p class="text-xs text-slate-400 mt-0.5"><%= time_ago_in_words(activity.created_at) %> ago</p>
+        </div>
+      </div>
+    <% end %>
+  <% else %>
+    <p class="text-sm text-slate-400 text-center py-4">No activity yet.</p>
+  <% end %>
+</div>

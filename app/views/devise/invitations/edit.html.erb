@@ -1,0 +1,55 @@
+<%# Accept Invitation — set your password %>
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 px-4">
+  <div class="w-full max-w-md">
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center justify-center w-14 h-14 bg-emerald-600 rounded-2xl shadow-xl shadow-emerald-900/50 mb-4">
+        <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+        </svg>
+      </div>
+      <h1 class="text-3xl font-extrabold text-white">Join the workspace</h1>
+      <p class="mt-1 text-slate-400 text-sm">Set your password to complete sign-up</p>
+    </div>
+
+    <div class="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-8 shadow-2xl">
+      <%= render "devise/shared/error_messages", resource: resource %>
+      <%= form_for(resource, as: resource_name, url: invitation_path(resource_name), html: { method: :put }) do |f| %>
+        <%= f.hidden_field :invitation_token %>
+
+        <div class="mb-4">
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Email</label>
+          <input type="email" value="<%= resource.email %>" disabled
+                 class="block w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-slate-400 text-sm cursor-not-allowed">
+        </div>
+
+        <div class="mb-4">
+          <%= f.label :name, class: "block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5" %>
+          <%= f.text_field :name, autofocus: true, placeholder: "Your full name",
+                class: "block w-full px-4 py-2.5 rounded-xl bg-white/10 border border-white/20
+                        text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2
+                        focus:ring-indigo-500 focus:border-transparent transition" %>
+        </div>
+
+        <div class="mb-4">
+          <%= f.label :password, "Set Password", class: "block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5" %>
+          <%= f.password_field :password, autocomplete: "new-password", placeholder: "••••••••",
+                class: "block w-full px-4 py-2.5 rounded-xl bg-white/10 border border-white/20
+                        text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2
+                        focus:ring-indigo-500 focus:border-transparent transition" %>
+        </div>
+
+        <div class="mb-6">
+          <%= f.label :password_confirmation, "Confirm Password", class: "block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5" %>
+          <%= f.password_field :password_confirmation, autocomplete: "new-password", placeholder: "••••••••",
+                class: "block w-full px-4 py-2.5 rounded-xl bg-white/10 border border-white/20
+                        text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2
+                        focus:ring-indigo-500 focus:border-transparent transition" %>
+        </div>
+
+        <%= f.submit "Accept Invitation",
+              class: "w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold
+                      text-sm rounded-xl shadow-lg transition-all cursor-pointer" %>
+      <% end %>
+    </div>
+  </div>
+</div>
