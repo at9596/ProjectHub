@@ -15,6 +15,12 @@ class TasksController < ApplicationController
     @comments = @task.comments.includes(:user).order(:created_at)
     @comment  = Comment.new
     @labels   = @project.organization.labels
+    # Users available for @mention in comments (owner + members)
+    member_users = @project.members.select(:id, :name, :email)
+    owner        = [ @project.owner ].select { |u| member_users.none? { |m| m.id == u.id } }
+    @mention_users = (member_users.to_a + owner).map do |u|
+      { id: u.id, name: u.name.presence || u.email.split("@").first, email: u.email }
+    end
   end
 
   def new

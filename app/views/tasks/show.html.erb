@@ -166,21 +166,59 @@
       <% end %>
     </div>
 
-    <%# New comment form %>
+    <%# New comment form with @mention dropdown %>
     <% if policy(Comment.new).create? %>
       <div class="border-t border-slate-100 pt-5">
         <%= form_with model: [@project, @task, @comment], url: project_task_comments_path(@project, @task) do |f| %>
           <div class="flex gap-3 items-start">
+            <%# Current user avatar %>
             <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 text-sm font-bold uppercase shrink-0 mt-1">
               <%= current_user.email.first %>
             </span>
-            <div class="flex-1">
+
+            <%# Mention-aware textarea wrapper %>
+            <div class="flex-1 relative"
+                 data-controller="mention"
+                 data-mention-users-value="<%= @mention_users.to_json %>">
+
+              <%# Textarea %>
               <%= f.text_area :body, rows: 3,
                     placeholder: "Add a comment… Use @name to mention someone",
+                    data: {
+                      mention_target: "textarea",
+                      action: "input->mention#onInput keydown->mention#onKeydown blur->mention#onBlur"
+                    },
                     class: "block w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-800
                             placeholder-slate-400 text-sm resize-none focus:outline-none focus:ring-2
                             focus:ring-indigo-500 transition" %>
-              <div class="flex justify-end mt-2">
+
+              <%# @mention dropdown — absolutely positioned below the textarea %>
+              <div data-mention-target="dropdown"
+                   class="hidden absolute z-50 bg-white border border-slate-200 rounded-2xl shadow-xl
+                          overflow-hidden min-w-[260px] max-h-56 overflow-y-auto"
+                   style="top:0;left:0;">
+                <%# Dropdown header %>
+                <div class="flex items-center gap-2 px-4 py-2 bg-slate-50 border-b border-slate-100">
+                  <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                  </svg>
+                  <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Mention a member</span>
+                </div>
+                <%# Items injected by JS %>
+                <ul data-mention-target="list" class="py-1"></ul>
+              </div>
+
+              <div class="flex items-center justify-between mt-2">
+                <%# Hint %>
+                <p class="text-xs text-slate-400 flex items-center gap-1">
+                  <span class="inline-flex items-center justify-center w-5 h-5 rounded bg-slate-100 font-mono text-slate-500 text-[10px]">@</span>
+                  to mention a member &nbsp;·&nbsp;
+                  <kbd class="inline-flex items-center justify-center px-1.5 py-0.5 rounded bg-slate-100 font-mono text-slate-500 text-[10px]">↑↓</kbd>
+                  navigate &nbsp;·&nbsp;
+                  <kbd class="inline-flex items-center justify-center px-1.5 py-0.5 rounded bg-slate-100 font-mono text-slate-500 text-[10px]">↵</kbd>
+                  select
+                </p>
                 <%= f.submit "Post Comment",
                       class: "px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm
                               font-semibold rounded-xl transition cursor-pointer" %>

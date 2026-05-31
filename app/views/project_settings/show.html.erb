@@ -31,7 +31,7 @@
                   <p class="text-xs text-slate-400"><%= m.role.humanize %></p>
                 </div>
               </div>
-              <%= button_to project_member_path(@project, m),
+              <%= button_to project_project_memberships_path(@project, m),
                     method: :delete,
                     data: { turbo_confirm: "Remove #{m.user.email} from this project?" },
                     class: "text-xs text-rose-500 hover:text-rose-700 border border-rose-200

@@ -32,8 +32,12 @@ class Users::InvitationsController < Devise::InvitationsController
         # Ensure org + role are set from invitation
         user.organization ||= current_inviter&.organization
         user.role ||= :member
+        # Skip email confirmation for invited users — they already verified via invite link
+        user.skip_confirmation!
         user.save(validate: false)
       end
     end
   end
+
+  private
 end
