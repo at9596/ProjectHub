@@ -1,7 +1,8 @@
 #!/bin/bash -e
 
-# Prepare the database on every boot (idempotent: creates DB if missing,
-# runs any pending migrations). Works regardless of how the server is invoked.
-./bin/rails db:prepare
+# If running the rails server then create or migrate existing database
+if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
+  ./bin/rails db:prepare
+fi
 
 exec "${@}"

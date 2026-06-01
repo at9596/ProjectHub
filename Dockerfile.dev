@@ -23,10 +23,7 @@ COPY vendor/ vendor/
 
 COPY . .
 
-COPY bin/docker-entrypoint-dev.sh /usr/bin/docker-entrypoint-dev.sh
-RUN chmod +x /usr/bin/docker-entrypoint-dev.sh
 
-ENTRYPOINT ["docker-entrypoint-dev.sh"]
 
 
 EXPOSE 3001
