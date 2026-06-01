@@ -1,0 +1,19 @@
+<%# Single notification row — used by index page AND real-time broadcasts %>
+<li id="<%= dom_id(notification) %>"
+    class="flex items-start gap-4 px-6 py-4 <%= notification.read? ? 'bg-white' : 'bg-indigo-50/40' %>">
+
+  <%# Actor avatar %>
+  <span class="inline-flex items-center justify-center w-9 h-9 rounded-full
+               bg-indigo-100 text-indigo-600 text-sm font-bold uppercase shrink-0 mt-0.5">
+    <%= (notification.actor.name || notification.actor.email).first %>
+  </span>
+
+  <div class="flex-1 min-w-0">
+    <p class="text-sm text-slate-800"><%= notification.message %></p>
+    <p class="text-xs text-slate-400 mt-0.5"><%= time_ago_in_words(notification.created_at) %> ago</p>
+  </div>
+
+  <% unless notification.read? %>
+    <span class="inline-block w-2 h-2 rounded-full bg-indigo-500 mt-2 shrink-0"></span>
+  <% end %>
+</li>

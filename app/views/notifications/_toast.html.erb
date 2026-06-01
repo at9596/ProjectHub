@@ -1,0 +1,24 @@
+<%# Real-time toast — auto-dismisses via CSS animation after 5s.
+    Appended into #notification-toasts by ActionCable broadcast. %>
+<div class="notification-toast" role="alert" aria-live="assertive">
+  <div class="flex items-start gap-3">
+    <div class="shrink-0 w-8 h-8 bg-indigo-500/20 rounded-full flex items-center justify-center">
+      <svg class="w-4 h-4 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5
+             a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436
+             L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+      </svg>
+    </div>
+    <div class="flex-1 min-w-0">
+      <p class="text-sm font-semibold text-white">New notification</p>
+      <p class="text-xs text-slate-300 mt-0.5 line-clamp-2"><%= notification.message %></p>
+    </div>
+    <button onclick="this.closest('.notification-toast').remove()"
+            class="shrink-0 text-slate-400 hover:text-white transition mt-0.5" aria-label="Dismiss">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+  </div>
+</div>
