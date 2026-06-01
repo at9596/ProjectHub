@@ -1,6 +1,5 @@
 class User < ApplicationRecord
-  rolify
-  belongs_to :organization, optional: true
+  # Enums
   enum :role, {
     owner: 0,
     admin: 1,
@@ -8,9 +7,19 @@ class User < ApplicationRecord
     viewer: 3
   }
 
-  devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :validatable,
-         :confirmable, :invitable
+  # Validations
+  validates :name, presence: true, on: :create
+
+  # Associations
+
+  with_options dependent: :destroy do |assoc|
+    assoc.has_many :notifications
+    assoc.has_many :activities
+    assoc.has_many :comments
+    assoc.has_many :project_memberships
+  end
+
+  belongs_to :organization, optional: true
 
   has_many :owned_projects,
            class_name: "Project",
@@ -22,12 +31,14 @@ class User < ApplicationRecord
            foreign_key: :assignee_id,
            dependent: :nullify
 
-  has_many :project_memberships, dependent: :destroy
   has_many :member_projects, through: :project_memberships, source: :project
 
-  has_many :comments, dependent: :destroy
-  has_many :activities, dependent: :destroy
-  has_many :notifications, dependent: :destroy
-
-  validates :name, presence: true, on: :create
+  # Devise modules
+  devise :database_authenticatable,
+         :registerable,
+         :recoverable,
+         :rememberable,
+         :validatable,
+         :confirmable,
+         :invitable
 end
