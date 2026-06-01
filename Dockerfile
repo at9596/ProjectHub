@@ -72,6 +72,9 @@ COPY --chown=rails:rails --from=build /rails /rails
 # Entrypoint prepares the database.
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
-# Start server via Thruster by default, this can be overwritten at runtime
-EXPOSE 80
-CMD ["./bin/thrust", "./bin/rails", "server"]
+# Start server via Thruster by default, this can be overwritten at runtime.
+# Set THRUSTER_ENABLED=false to bypass Thruster and start Puma directly
+# (e.g. on Render, which handles TLS and compression at the edge).
+EXPOSE 3000
+CMD ["./bin/rails", "server", "-b", "0.0.0.0"]
+

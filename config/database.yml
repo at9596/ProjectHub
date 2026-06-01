@@ -23,6 +23,7 @@ default: &default
 development:
   <<: *default
   database: project_hub_development
+  url: <%= ENV.fetch("DATABASE_URL", nil) %>
 
   # The specified database role being used to connect to PostgreSQL.
   # To create additional roles in PostgreSQL see `$ createuser --help`.
@@ -85,20 +86,6 @@ test:
 # for a full overview on how database connection configuration can be specified.
 #
 production:
-  primary: &primary_production
-    <<: *default
-    database: project_hub_production
-    username: project_hub
-    password: <%= ENV["PROJECT_HUB_DATABASE_PASSWORD"] %>
-  cache:
-    <<: *primary_production
-    database: project_hub_production_cache
-    migrations_paths: db/cache_migrate
-  queue:
-    <<: *primary_production
-    database: project_hub_production_queue
-    migrations_paths: db/queue_migrate
-  cable:
-    <<: *primary_production
-    database: project_hub_production_cable
-    migrations_paths: db/cable_migrate
+  <<: *default
+  url: <%= ENV["DATABASE_URL"] %>
+

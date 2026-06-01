@@ -10,7 +10,6 @@ class Users::RegistrationsController < Devise::RegistrationsController
     # Auto-create organization from the provided name
     org_name = params.dig(:user, :organization_name).presence || "#{sign_up_params[:name]}'s Workspace"
     resource.organization = Organization.new(name: org_name)
-    debugger
     resource.role = :owner
 
     # Auto-confirm so users can log in without SMTP configured.

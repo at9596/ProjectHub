@@ -1,0 +1,34 @@
+ARG RUBY_VERSION=3.3.2
+FROM docker.io/library/ruby:$RUBY_VERSION-slim
+
+
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y \
+      build-essential \
+      curl \
+      git \
+      libpq-dev \
+      libvips \
+      libyaml-dev \
+      pkg-config \
+      postgresql-client \
+    && rm -rf /var/lib/apt/lists /var/cache/apt/archives
+
+WORKDIR /rails
+
+COPY Gemfile Gemfile.lock ./
+RUN bundle install
+
+COPY vendor/ vendor/
+
+COPY . .
+
+COPY bin/docker-entrypoint-dev.sh /usr/bin/docker-entrypoint-dev.sh
+RUN chmod +x /usr/bin/docker-entrypoint-dev.sh
+
+ENTRYPOINT ["docker-entrypoint-dev.sh"]
+
+
+EXPOSE 3001
+
+CMD ["bin/rails", "server", "-b", "0.0.0.0", "-p", "3001"]
